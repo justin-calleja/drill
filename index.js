@@ -20,12 +20,14 @@ var argv = require('yargs')
       'default': false
     }
   }, function(argv) {
-    console.log('in gen command with noLaunchEditor:', argv['noLaunchEditor']);
-    console.log('argv:', argv);
+    // console.log('in gen command with noLaunchEditor:', argv['noLaunchEditor']);
+    // console.log('argv:', argv);
     var workspacePath = nconf.get('workspace.path');
-    console.log('workspacePath:', workspacePath);
+    // console.log('workspacePath:', workspacePath);
     resetWorkspace(workspacePath, () => {
-      tmp(workspacePath);
+      if (!argv['no-launch-editor']) {
+        tmp(workspacePath);
+      }
     });
   })
   .argv;
