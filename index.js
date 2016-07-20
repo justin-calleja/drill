@@ -1,49 +1,31 @@
 #!/usr/bin/env node
 
-var meow = require('meow');
+require('./utils/setup')();
+
 var nconf = require('nconf');
 var os = require('os');
 var path = require('path');
 var fs = require('fs');
-var configDirExists = require('./utils/configDirExists');
-var createDefaultConfigDir = require('./utils/createDefaultConfigDir');
-var conf = require('./utils/conf');
 var resetWorkspace = require('./utils/resetWorkspace');
 var tmp = require('./utils/tmp');
 
-const cli = meow(`
-    Usage:
-        $ drill
-        -h, --help            print usage information
-        -v, --version         show version info and exit
-`, {
-  alias: {
-    v: 'version',
-    h: 'help'
-  }
-});
-
-var exists = configDirExists();
-if (!exists) {
-  createDefaultConfigDir();
-}
-
-nconf.argv()
-  .env()
-  .file({ file: conf.confFilePath() });
-
-// var repl = require('repl');
-// var replServer = repl.start({
-//   prompt: '> ',
-// });
-// replServer.context.nconf = nconf;
-// debugger;
-
-var workspacePath = nconf.get('workspace.path');
-
-resetWorkspace(workspacePath, () => {
-  tmp(workspacePath);
-  // console.log('process.cwd():', process.cwd());
-  // process.chdir(workspacePath);
-  // console.log('process.cwd():', process.cwd());
-});
+var argv = require('yargs')
+  .usage('$0 <cmd> [args]')
+  .help('h')
+  .alias('h', 'help')
+  .command('gen [no-launch-editor]', 'generates a new drill in the workspace', {
+    'no-launch-editor': {
+      alias: 'n',
+      describe: 'used to skip launching editor in workspace',
+      'default': false
+    }
+  }, function(argv) {
+    console.log('in gen command with noLaunchEditor:', argv['noLaunchEditor']);
+    console.log('argv:', argv);
+    var workspacePath = nconf.get('workspace.path');
+    console.log('workspacePath:', workspacePath);
+    resetWorkspace(workspacePath, () => {
+      tmp(workspacePath);
+    });
+  })
+  .argv;

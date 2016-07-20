@@ -8,7 +8,7 @@ function _confFileName() {
 }
 
 function _confDirPath() {
-  return path.join(os.homedir(), '.qsetup');
+  return path.join(os.homedir(), '.drill');
 }
 
 function _confFilePath() {

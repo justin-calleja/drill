@@ -1,11 +1,9 @@
-var path = require('path');
-var os = require('os');
 var fs = require('fs');
+var conf = require('./conf');
 
 module.exports = function configDirExists() {
-  var configPath = path.join(os.homedir(), '.qsetup') ;
   try {
-    var stats = fs.statSync(configPath);
+    var stats = fs.statSync(conf.confDirPath());
   } catch (e) {
     if (e.code === 'ENOENT') {
       return false;
