@@ -39,7 +39,7 @@ nconf.argv()
 // replServer.context.nconf = nconf;
 // debugger;
 
-var workspacePath = nconf.get('workspace.path')
+var workspacePath = nconf.get('workspace.path');
 
 resetWorkspace(workspacePath, () => {
   tmp(workspacePath);
@@ -47,4 +47,3 @@ resetWorkspace(workspacePath, () => {
   // process.chdir(workspacePath);
   // console.log('process.cwd():', process.cwd());
 });
-

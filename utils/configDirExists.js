@@ -6,7 +6,7 @@ module.exports = function configDirExists() {
   var configPath = path.join(os.homedir(), '.qsetup') ;
   try {
     var stats = fs.statSync(configPath);
-  } catch(e) {
+  } catch (e) {
     if (e.code === 'ENOENT') {
       return false;
     } else {
@@ -14,4 +14,4 @@ module.exports = function configDirExists() {
     }
   }
   return stats.isDirectory();
-}
+};

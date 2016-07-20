@@ -37,7 +37,8 @@ module.exports = function resetWorkspace(workspacePath, cb) {
             del(DEL_PATTERNS, {
               force: true
             }).then(paths => cb(null, paths));
-          }, function onNotOk() {
+          },
+          function onNotOk() {
             cb(null);
           }
         ));

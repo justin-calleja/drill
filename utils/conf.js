@@ -7,12 +7,12 @@ function _confFileName() {
   return 'conf.json';
 }
 
-function _confFilePath() {
-  return path.join(_confDirPath(), 'conf.json');
-}
-
 function _confDirPath() {
   return path.join(os.homedir(), '.qsetup');
+}
+
+function _confFilePath() {
+  return path.join(_confDirPath(), 'conf.json');
 }
 
 var defaultConfigFileTmplStr = fs.readFileSync(path.join(__dirname, 'defaultConfigFile.tmpl.json')).toString();
