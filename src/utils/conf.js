@@ -1,28 +1,18 @@
 var path = require('path');
 var os = require('os');
-var _ = require('lodash');
-var fs = require('fs');
 
-function _confFileName() {
-  return 'conf.json';
-}
+const _confFileName = 'conf.json';
+const _drillDirPath = path.join(os.homedir(), '.drill');
+const _confFilePath = path.join(_drillDirPath, 'conf.json');
 
-function _drillDirPath() {
-  return path.join(os.homedir(), '.drill');
-}
-
-function _confFilePath() {
-  return path.join(_drillDirPath(), 'conf.json');
-}
-
-var defaultConfigFileTmplStr = fs.readFileSync(path.join(__dirname, 'defaultConfigFile.tmpl.json')).toString();
-var compiled = _.template(defaultConfigFileTmplStr);
-function _confFileContents() {
-  return compiled({
-    workspacePath: path.join(_drillDirPath(), 'drill-workspace'),
-    defaultMaterialPath: path.join(os.homedir(), 'drill-material')
-  });
-}
+const _workspacePath = path.join(_drillDirPath, 'drill-workspace');
+const _defaultMaterialPath = path.join(os.homedir(), 'drill-material');
+const _confFileContents = `{
+  "workspace.path": "${_workspacePath}",
+  "materials.paths": [
+    "${_defaultMaterialPath}"
+  ]
+}`;
 
 module.exports = {
   confFileName: _confFileName,
