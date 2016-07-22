@@ -7,25 +7,25 @@ function _confFileName() {
   return 'conf.json';
 }
 
-function _confDirPath() {
+function _drillDirPath() {
   return path.join(os.homedir(), '.drill');
 }
 
 function _confFilePath() {
-  return path.join(_confDirPath(), 'conf.json');
+  return path.join(_drillDirPath(), 'conf.json');
 }
 
 var defaultConfigFileTmplStr = fs.readFileSync(path.join(__dirname, 'defaultConfigFile.tmpl.json')).toString();
 var compiled = _.template(defaultConfigFileTmplStr);
 function _confFileContents() {
   return compiled({
-    workspacePath: path.join(os.homedir(), 'workspace-for-drill')
+    workspacePath: path.join(os.homedir(), 'drill-workspace')
   });
 }
 
 module.exports = {
   confFileName: _confFileName,
   confFilePath: _confFilePath,
-  confDirPath: _confDirPath,
+  drillDirPath: _drillDirPath,
   confFileContents: _confFileContents
 };

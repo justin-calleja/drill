@@ -1,9 +1,9 @@
 var fs = require('fs');
-var conf = require('./conf');
+var conf = require('../utils/conf');
 
-module.exports = function configDirExists() {
+module.exports = function drillDirExists() {
   try {
-    var stats = fs.statSync(conf.confDirPath());
+    var stats = fs.statSync(conf.drillDirPath());
   } catch (e) {
     if (e.code === 'ENOENT') {
       return false;

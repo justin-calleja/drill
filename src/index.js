@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-require('./utils/setup')();
+require('./setup')();
 
 var nconf = require('nconf');
-var os = require('os');
-var path = require('path');
-var fs = require('fs');
+// var os = require('os');
+// var path = require('path');
+// var fs = require('fs');
 var resetWorkspace = require('./utils/resetWorkspace');
 var tmp = require('./utils/tmp');
 

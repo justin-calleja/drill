@@ -1,5 +1,4 @@
 var dirExists = require('./dirExists');
-var fs = require('fs');
 var extfs = require('extfs');
 var mkdirp = require('mkdirp');
 var del = require('del');

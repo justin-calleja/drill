@@ -7,7 +7,7 @@ module.exports = function(workspacePath) {
     stdio: 'inherit'
   });
 
-  child.on('exit', function(code) {
-    console.log('finished with code:', code);
+  child.on('exit', function(_code) {
+    // it's always finishing with code 1
   });
 };
