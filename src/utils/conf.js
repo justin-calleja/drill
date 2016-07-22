@@ -19,7 +19,8 @@ var defaultConfigFileTmplStr = fs.readFileSync(path.join(__dirname, 'defaultConf
 var compiled = _.template(defaultConfigFileTmplStr);
 function _confFileContents() {
   return compiled({
-    workspacePath: path.join(_drillDirPath(), 'drill-workspace')
+    workspacePath: path.join(_drillDirPath(), 'drill-workspace'),
+    defaultMaterialPath: path.join(os.homedir(), 'drill-material')
   });
 }
 

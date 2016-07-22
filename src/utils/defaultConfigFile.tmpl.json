@@ -1,3 +1,6 @@
 {
-  "workspace.path": "<%= workspacePath %>"
+  "workspace.path": "<%= workspacePath %>",
+  "materials.paths": [
+    "<%= defaultMaterialPath %>"
+  ]
 }
