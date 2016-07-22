@@ -1,13 +1,14 @@
 var nconf = require('nconf');
-var drillDirExists = require('./drillDirExists');
-var createDefaultDrillDir = require('./createDefaultDrillDir');
-var conf = require('../utils/conf');
+var fileExists = require('file-exists');
+var doSetup = require('./doSetup');
+
+const CONF_FILE_PATH = require('../utils/conf').confFilePath();
 
 module.exports = function _setup() {
-  if (!drillDirExists()) {
-    createDefaultDrillDir();
+  if (!fileExists(CONF_FILE_PATH)) {
+    doSetup();
   }
 
   nconf.env()
-    .file({ file: conf.confFilePath() });
+    .file({ file: CONF_FILE_PATH });
 };
