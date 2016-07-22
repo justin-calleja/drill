@@ -9,6 +9,5 @@ module.exports = function _setup() {
     doSetup();
   }
 
-  nconf.env()
-    .file({ file: CONF_FILE_PATH });
+  nconf.file({ file: CONF_FILE_PATH });
 };

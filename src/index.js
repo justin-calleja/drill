@@ -4,10 +4,12 @@ require('./setup')();
 
 var gen = require('./commands/gen');
 var install = require('./commands/install');
+var lsconf = require('./commands/lsconf');
 
 require('yargs')
   .usage('$0 <cmd>')
-  .command('install <url> [name] [head]', 'installs material ', {
+  .command('lsconf', 'list configuration', {}, lsconf)
+  .command('install <url> [name] [head]', 'installs material from given url', {
     url: {
       alias: 'u',
       describe: 'The url to use to install into the head materials path'
