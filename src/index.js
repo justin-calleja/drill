@@ -7,6 +7,7 @@ var install = require('./commands/install');
 var lsconf = require('./commands/lsconf');
 var rconf = require('./commands/rconf');
 var econf = require('./commands/econf');
+var pathCmd = require('./commands/path');
 
 require('yargs')
   .usage('$0 <cmd>')
@@ -34,6 +35,7 @@ require('yargs')
   }, gen)
   .command('rconf', 'resets config to default', rconf)
   .command('econf', 'edit config', econf)
+  .command('path', 'prints drill directory path', pathCmd)
   .required( 1, 'At least one command is required to operate drill')
   .help()
   // .epilog( 'Link to submit issues / feature requests?')
