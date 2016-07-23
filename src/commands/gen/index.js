@@ -1,15 +1,23 @@
 var resetWorkspace = require('../../utils/resetWorkspace');
-var tmp = require('../../utils/tmp');
+var launchEditor = require('../../utils/launchEditor');
 var nconf = require('nconf');
+var async = require('async');
 
 module.exports = function _gen(argv) {
-  // console.log('in gen command with noLaunchEditor:', argv['noLaunchEditor']);
-  // console.log('argv:', argv);
   var workspacePath = nconf.get('workspace.path');
-  // console.log('workspacePath:', workspacePath);
-  resetWorkspace(workspacePath, () => {
+  var doResetWorkspace = function _doResetWorkspace(cb) {
+    resetWorkspace(workspacePath, () => {
+      cb(null);
+    });
+  };
+
+  async.parallel([doResetWorkspace, doGenerateDrill], function _genDone() {
     if (!argv['no-launch-editor']) {
-      tmp(workspacePath);
+      launchEditor(workspacePath, () => {
+        console.log('TODO: read user submitted answers');
+        console.log('TODO: check answers');
+        console.log('TODO: write data to keep track of what was asked, when, and how the user did');
+      });
     }
   });
 };
