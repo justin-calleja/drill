@@ -1,5 +1,5 @@
 var dirExistsSync = require('@justinc/dir-exists').dirExistsSync;
-var fs = require('extfs');
+var emptyDir = require('empty-dir');
 var mkdirp = require('mkdirp');
 var del = require('del');
 var chalk = require('chalk');
@@ -25,7 +25,7 @@ function answersHandlerFactory(onOkDelete, onNotOkDelete) {
 
 module.exports = function resetWorkspace(workspacePath, cb) {
   if (dirExistsSync(workspacePath)) {
-    if (!fs.isEmptySync(workspacePath)) {
+    if (!emptyDir.sync(workspacePath)) {
       const DEL_PATTERNS = [path.join(workspacePath, '**'), '!' + workspacePath];
       confirmFileDeletion(DEL_PATTERNS).then(answersHandlerFactory(
           function onOk() {
