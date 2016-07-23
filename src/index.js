@@ -8,10 +8,10 @@ var lsconf = require('./commands/lsconf');
 var rconf = require('./commands/rconf');
 var econf = require('./commands/econf');
 var pathCmd = require('./commands/path');
+var lsmaterials = require('./commands/lsmaterials');
 
 require('yargs')
   .usage('$0 <cmd>')
-  .command('lsconf', 'list configuration', {}, lsconf)
   .command('install <url> [name] [head]', 'installs material from given url', {
     url: {
       alias: 'u',
@@ -33,9 +33,11 @@ require('yargs')
       'default': false
     }
   }, gen)
+  .command('lsconf', 'list configuration', {}, lsconf)
   .command('rconf', 'resets config to default', rconf)
   .command('econf', 'edit config', econf)
   .command('path', 'prints drill directory path', pathCmd)
+  .command('lsmaterials', 'list available materials', lsmaterials)
   .required( 1, 'At least one command is required to operate drill')
   .help()
   // .epilog( 'Link to submit issues / feature requests?')
