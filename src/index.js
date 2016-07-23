@@ -5,6 +5,7 @@ require('./setup')();
 var gen = require('./commands/gen');
 var install = require('./commands/install');
 var lsconf = require('./commands/lsconf');
+var resetConfig = require('./commands/rconf');
 
 require('yargs')
   .usage('$0 <cmd>')
@@ -30,6 +31,7 @@ require('yargs')
       'default': false
     }
   }, gen)
+  .command('rconf', 'resets config to default', resetConfig)
   .required( 1, 'At least one command is required to operate drill')
   .help()
   // .epilog( 'Link to submit issues / feature requests?')

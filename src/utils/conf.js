@@ -6,9 +6,11 @@ const _drillDirPath = path.join(os.homedir(), '.drill');
 const _confFilePath = path.join(_drillDirPath, 'conf.json');
 
 const _workspacePath = path.join(_drillDirPath, 'drill-workspace');
+const _dbPath = path.join(_drillDirPath, 'db');
 const _defaultMaterialPath = path.join(os.homedir(), 'drill-material');
 const _confFileContents = `{
   "workspace.path": "${_workspacePath}",
+  "db.path": "${_dbPath}",
   "materials.paths": [
     "${_defaultMaterialPath}"
   ]
