@@ -1,11 +1,5 @@
-var install = require('./install');
-var gen = require('./gen');
-var lsconf = require('./lsconf');
-var rconf = require('./rconf');
-var econf = require('./econf');
-var pathCmd = require('./path');
-var lsmaterials = require('./lsmaterials');
-
+// Commands are required in fun so they can be wrapped around an anon function.
+// This prevents each command's files to be evaluated unless the user asks for that specific command.
 module.exports = [
   {
     txt: 'install <url> [name] [head]',
@@ -24,7 +18,7 @@ module.exports = [
         describe: 'Use the head container path to install into even if there are multiple container paths'
       }
     },
-    fun: install
+    fun: argv => require('./install')(argv)
   },
   {
     txt: 'gen [no-launch-editor]',
@@ -36,36 +30,36 @@ module.exports = [
         'default': false
       }
     },
-    fun: gen
+    fun: argv => require('./gen')(argv)
   },
   {
     txt: 'lsconf',
     desc: 'list configuration',
     opts: {},
-    fun: lsconf
+    fun: argv => require('./lsconf')(argv)
   },
   {
     txt: 'rconf',
     desc: 'resets configuration to default',
     opts: {},
-    fun: rconf
+    fun: argv => require('./rconf')(argv)
   },
   {
     txt: 'econf',
     desc: 'edit configuration',
     opts: {},
-    fun: econf
+    fun: argv => require('./econf')(argv)
   },
   {
     txt: 'path',
     desc: 'prints drill directory path',
     opts: {},
-    fun: pathCmd
+    fun: argv => require('./path')(argv)
   },
   {
     txt: 'lsmaterials',
     desc: 'list available materials',
     opts: {},
-    fun: lsmaterials
+    fun: argv => require('./lsmaterials')(argv)
   }
 ];
