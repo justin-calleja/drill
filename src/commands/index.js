@@ -21,7 +21,7 @@ module.exports = [
       },
       head: {
         alias: 'h',
-        describe: 'Use the head materials path to install into even if there are multiple materials paths'
+        describe: 'Use the head container path to install into even if there are multiple container paths'
       }
     },
     fun: install
