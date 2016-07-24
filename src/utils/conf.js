@@ -5,20 +5,21 @@ const _confFileName = 'conf.json';
 const _drillDirPath = path.join(os.homedir(), '.drill');
 const _confFilePath = path.join(_drillDirPath, 'conf.json');
 
-const _workspacePath = path.join(_drillDirPath, 'drill-workspace');
-const _dbPath = path.join(_drillDirPath, 'db');
-const _defaultMaterialPath = path.join(os.homedir(), 'drill-material');
-const _confFileContents = `{
-  "workspace.path": "${_workspacePath}",
-  "db.path": "${_dbPath}",
-  "materials.paths": [
-    "${_defaultMaterialPath}"
-  ]
-}`;
+const kvs = [
+  ['workspace.path', path.join(_drillDirPath, 'drill-workspace')],
+  ['db.path', path.join(_drillDirPath, 'db')],
+  ['container.paths', [path.join(os.homedir(), 'default-drill-material-container')]]
+];
+
+const _confObj = kvs.reduce((acc, val) => {
+  acc[val[0]] = val[1];
+  return acc;
+}, {});
 
 module.exports = {
   confFileName: _confFileName,
   confFilePath: _confFilePath,
   drillDirPath: _drillDirPath,
-  confFileContents: _confFileContents
+  confObj: _confObj,
+  confStr: JSON.stringify(_confObj, null, 2)
 };
