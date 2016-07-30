@@ -19,11 +19,11 @@ module.exports = (workspacePath, cb) => {
           promptDel({ patterns, promptMsg }, cb);
         }
         // empty workspace, nothing to reset
-        return;
+        return cb(null);
       });
     } else {
       // workspace does not exist, so create it
-      mkdirp(workspacePath, cb);
+      return mkdirp(workspacePath, cb);
     }
   });
 };
