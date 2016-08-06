@@ -40,7 +40,7 @@ function calculateStrengthByLastAskedTime(value, daysAndPoints) {
 // var winston = require('winston');
 // var path = require('path');
 // const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
-// const LAST_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastRunLogFileName;
+// const LAST_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
 // winston.add(winston.transports.File, { filename: path.join(DRILL_DIR_PATH, LAST_RUN_LOG_FILE_NAME) });
 // winston.remove(winston.transports.Console);
 

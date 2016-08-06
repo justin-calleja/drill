@@ -6,6 +6,10 @@ module.exports = {
       alias: 's',
       describe: 'Used to skip launching editor in workspace',
       'default': false
+    },
+    'log-level': {
+      describe: 'Used to set the log level',
+      'default': 'info'
     }
   },
   handler: argv => require('./gen')(argv)
