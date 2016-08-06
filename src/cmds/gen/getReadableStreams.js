@@ -29,11 +29,11 @@ process.on('uncaughtException', (err) => {
  * Returns an array where each element is an array of length 2. Each element's first position is
  * the container name. The second position is an array of readable streams found in that container's
  * materials.
- * @param  {Function} cb  [description]
  * @param  {[type]}   log [description]
+ * @param  {Function} cb  [description]
  * @return {[type]}       [description]
  */
-module.exports = (cb, log) => {
+module.exports = (log, cb) => {
 
   async.map(CONTAINER_PATHS, dirs, (err, results) => {
     if (err) {
