@@ -16,7 +16,7 @@ module.exports = (workspacePath, cb) => {
         if (!isEmpty) {
           var patterns = [path.join(workspacePath, '**'), '!' + workspacePath];
           var promptMsg = chalk.red('About to delete workspace!') + `\nPatterns to delete by:\n${patterns}`;
-          promptDel({ patterns, promptMsg }, cb);
+          return promptDel({ patterns, promptMsg }, cb);
         }
         // empty workspace, nothing to reset
         return cb(null);

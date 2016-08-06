@@ -26,6 +26,7 @@
     "inquirer": "^1.1.2",
     "level": "^1.4.0",
     "mkdirp": "^0.5.1",
+    "moment": "^2.14.1",
     "yargs": "^4.8.1"
   },
   "devDependencies": {
