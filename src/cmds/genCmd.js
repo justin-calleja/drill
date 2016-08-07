@@ -2,10 +2,11 @@ module.exports = {
   command: 'gen [no-launch-editor]',
   desc: 'generates a new drill in the workspace',
   builder: {
-    'skip-edit': {
-      alias: 's',
-      describe: 'Used to skip launching editor in workspace',
-      'default': false
+    'editor-yes': {
+      describe: 'Launch editor in workspace after drill gen is complete'
+    },
+    'editor-no': {
+      describe: 'Do not launch editor in workspace after drill gen is complete'
     },
     'log-level': {
       describe: 'Used to set the log level',

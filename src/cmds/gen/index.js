@@ -3,6 +3,7 @@ var async = require('async');
 var del = require('del');
 var bunyan = require('bunyan');
 var path = require('path');
+
 const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
 const LAST_GEN_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
 var getOrDie = require('@justinc/drill-conf').getOrDie;
@@ -11,6 +12,7 @@ const WORKSPACE_PATH = getOrDie('workspace.path');
 const LOG_FILE_PATH = path.join(DRILL_DIR_PATH, LAST_GEN_RUN_LOG_FILE_NAME);
 
 module.exports = function _gen(argv) {
+
   del.sync([ LOG_FILE_PATH ], { force: true });
   var log = bunyan.createLogger({
     name: 'drill-gen',
@@ -24,17 +26,41 @@ module.exports = function _gen(argv) {
   }, function(err, results) {
     if (err) throw err;
 
-    console.log('results.getReadableStreams:', results.getReadableStreams);
+    // console.log('results.getReadableStreams:', results.getReadableStreams);
     // [
     //   [ '/Users/justin/default-drill-material-container', [ [Object], [Object] ] ]
     // ]
 
-    if (!argv['skip-edit']) {
+    if (argv.editorNo) {
+      console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+    } else if (argv.editorYes) {
       launchEditor(WORKSPACE_PATH, () => {
         console.log('TODO: read user submitted answers');
         console.log('TODO: check answers');
         console.log('TODO: write data to keep track of what was asked, when, and how the user did');
       });
+    } else {
+      var inquirer = require('inquirer');
+      var prompt = inquirer.createPromptModule();
+      prompt([
+        {
+          type: 'confirm',
+          name: 'okOpenEditor',
+          message: 'Do you want to open your editor in the workspace now?',
+          'default': true
+        }
+      ]).then(answers => {
+        if (answers.okOpenEditor) {
+          launchEditor(WORKSPACE_PATH, () => {
+            console.log('TODO: read user submitted answers');
+            console.log('TODO: check answers');
+            console.log('TODO: write data to keep track of what was asked, when, and how the user did');
+          });
+        } else {
+          console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+        }
+      });
     }
+
   });
 };
