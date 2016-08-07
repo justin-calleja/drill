@@ -1,12 +1,12 @@
 var levelup = require('level');
 var fs = require('fs');
 var dirs = require('@justinc/dirs').dirs;
-var defaultMaterialDirName = require('@justinc/drill-conf').defaultMaterialDirName;
+const DEFAULT_MATERIAL_DIR_NAME = require('@justinc/drill-conf').defaultMaterialDirName;
 var async = require('async');
 var getOrDie = require('@justinc/drill-conf').getOrDie;
 var path = require('path');
 var glob = require('glob');
-var flatten = require('lodash.flatten');
+var R = require('ramda');
 
 const DB_PATH = getOrDie('db.path');
 const CONTAINER_PATHS = getOrDie('container.paths');
@@ -26,9 +26,21 @@ process.on('uncaughtException', (err) => {
 });
 
 /**
- * Returns an array where each element is an array of length 2. Each element's first position is
- * the container name. The second position is an array of readable streams found in that container's
- * materials.
+ * @param  {string} absPath    The absolute path to look for JSON files in
+ * @return {Mabye([string])}          An array of filenames
+ */
+function syncGetAllJSONFileNamesOrDie(absPath) {
+  var fileNames = null;
+  try {
+    fileNames = glob.sync('*.json', { cwd: absPath });
+  } catch (err) {
+    console.log(err.message);
+    process.exit(1);
+  }
+  return fileNames;
+}
+
+/**
  * @param  {[type]}   log [description]
  * @param  {Function} cb  [description]
  * @return {[type]}       [description]
@@ -36,32 +48,55 @@ process.on('uncaughtException', (err) => {
 module.exports = (log, cb) => {
 
   async.map(CONTAINER_PATHS, dirs, (err, results) => {
-    if (err) {
-      return cb(err);
-    }
+    if (err) return cb(err);
 
-    var result = CONTAINER_PATHS.map((containerPath, i) => {
-      log.debug(`Container path ${containerPath} has the following materials: ${results[i].join(', ')}`);
-      var readableStreams = flatten(results[i].map(materialDirName => {
-        var materialPath = path.join(containerPath, materialDirName, defaultMaterialDirName);
-        var fileNames = null;
-        try {
-          fileNames = glob.sync('*.json', { cwd: materialPath });
-        } catch (err) {
-          console.log(err.message);
-          process.exit(1);
-        }
+    var res = R.compose(
+      R.map(fs.createReadStream),
+      R.chain(([ absPath, fileNames ]) => fileNames.map(name => path.join(absPath, name))),
+      R.tap(R.forEach(([ absPath, fileNames ]) => log.debug(`Streaming from ${absPath + path.sep}{${fileNames.join(', ')}}`))),
+      R.map(absPath => [absPath, syncGetAllJSONFileNamesOrDie(absPath)]),
+      R.chain(([ containerPath, dirNames ]) => {
+        return dirNames.map(dirName => path.join(containerPath, dirName, DEFAULT_MATERIAL_DIR_NAME));
+      }),
+      R.tap(R.forEach(([
+        containerPath,
+        dirNames
+      ]) => log.debug(`Materials at '${containerPath}': ${dirNames.join(', ')}`))),
+      // R.tap(listOfContainerPathAndDirNames => listOfContainerPathAndDirNames.forEach([containerPath, dirNames]) =>
+      // R.tap(([
+      //   containerPath,
+      //   dirNames
+      // ]) => log.debug(`Container path ${containerPath} has the following materials: ${dirNames.join(', ')}`)),
+      R.zipWith((a, b) => [a, b])
+    )(CONTAINER_PATHS, results);
 
-        return fileNames.map(fileName => {
-          var filePath = path.join(materialPath, fileName);
-          log.debug(`Streaming from ${filePath}`);
-          return fs.createReadStream(filePath);
-        });
-      }));
-      return [containerPath, readableStreams];
-    });
+    console.log('res.length:', res.length);
 
-    cb(null, result);
+    cb(null, res);
+
+    // cb(
+    //   null,
+    //   // iterating over CONTAINER_PATHS in order to be able to relate a single
+    //   // containerPath with its result in results via results[i]
+    //   CONTAINER_PATHS.reduce((acc, containerPath, i) => {
+    //     // results[i] is an array of material directory names
+    //     log.debug(`Container path ${containerPath} has the following materials: ${results[i].join(', ')}`);
+    //
+    //     return acc.concat(R.chain(materialDirName => {
+    //       var materialFilesDirAbsPath = path.join(containerPath, materialDirName, DEFAULT_MATERIAL_DIR_NAME);
+    //
+    //       return R.compose(
+    //         R.map(fs.createReadStream),
+    //         R.map(name => path.join(materialFilesDirAbsPath, name)),
+    //         R.tap(fileNames => log.debug(`Streaming from ${materialFilesDirAbsPath + path.sep}{${fileNames.join(', ')}}`)),
+    //         syncGetAllJSONFileNamesOrDie
+    //       ) (materialFilesDirAbsPath);
+    //
+    //     }, results[i]));
+    //
+    //   }, [])
+    // );
+
   });
 
 };

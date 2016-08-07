@@ -26,7 +26,7 @@ module.exports = function _gen(argv) {
   }, function(err, results) {
     if (err) throw err;
 
-    // console.log('results.getReadableStreams:', results.getReadableStreams);
+    console.log('results.getReadableStreams:', results.getReadableStreams);
     // [
     //   [ '/Users/justin/default-drill-material-container', [ [Object], [Object] ] ]
     // ]
