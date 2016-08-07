@@ -27,7 +27,7 @@ process.on('uncaughtException', (err) => {
 
 /**
  * @param  {string} absPath    The absolute path to look for JSON files in
- * @return {Mabye([string])}          An array of filenames
+ * @return {Mabye([string])}   An array of filenames
  */
 function syncGetAllJSONFileNamesOrDie(absPath) {
   var fileNames = null;
@@ -50,7 +50,7 @@ module.exports = (log, cb) => {
   async.map(CONTAINER_PATHS, dirs, (err, results) => {
     if (err) return cb(err);
 
-    var res = R.compose(
+    var syncGetReadableStreams = R.compose(
       R.map(fs.createReadStream),
       R.chain(([ absPath, fileNames ]) => fileNames.map(name => path.join(absPath, name))),
       R.tap(R.forEach(([ absPath, fileNames ]) => log.debug(`Streaming from ${absPath + path.sep}{${fileNames.join(', ')}}`))),
@@ -62,41 +62,10 @@ module.exports = (log, cb) => {
         containerPath,
         dirNames
       ]) => log.debug(`Materials at '${containerPath}': ${dirNames.join(', ')}`))),
-      // R.tap(listOfContainerPathAndDirNames => listOfContainerPathAndDirNames.forEach([containerPath, dirNames]) =>
-      // R.tap(([
-      //   containerPath,
-      //   dirNames
-      // ]) => log.debug(`Container path ${containerPath} has the following materials: ${dirNames.join(', ')}`)),
       R.zipWith((a, b) => [a, b])
-    )(CONTAINER_PATHS, results);
+    );
 
-    console.log('res.length:', res.length);
-
-    cb(null, res);
-
-    // cb(
-    //   null,
-    //   // iterating over CONTAINER_PATHS in order to be able to relate a single
-    //   // containerPath with its result in results via results[i]
-    //   CONTAINER_PATHS.reduce((acc, containerPath, i) => {
-    //     // results[i] is an array of material directory names
-    //     log.debug(`Container path ${containerPath} has the following materials: ${results[i].join(', ')}`);
-    //
-    //     return acc.concat(R.chain(materialDirName => {
-    //       var materialFilesDirAbsPath = path.join(containerPath, materialDirName, DEFAULT_MATERIAL_DIR_NAME);
-    //
-    //       return R.compose(
-    //         R.map(fs.createReadStream),
-    //         R.map(name => path.join(materialFilesDirAbsPath, name)),
-    //         R.tap(fileNames => log.debug(`Streaming from ${materialFilesDirAbsPath + path.sep}{${fileNames.join(', ')}}`)),
-    //         syncGetAllJSONFileNamesOrDie
-    //       ) (materialFilesDirAbsPath);
-    //
-    //     }, results[i]));
-    //
-    //   }, [])
-    // );
-
+    return cb(null, syncGetReadableStreams(CONTAINER_PATHS, results));
   });
 
 };
