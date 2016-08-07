@@ -40,17 +40,8 @@ module.exports = function _gen(argv) {
         console.log('TODO: write data to keep track of what was asked, when, and how the user did');
       });
     } else {
-      var inquirer = require('inquirer');
-      var prompt = inquirer.createPromptModule();
-      prompt([
-        {
-          type: 'confirm',
-          name: 'okOpenEditor',
-          message: 'Do you want to open your editor in the workspace now?',
-          'default': true
-        }
-      ]).then(answers => {
-        if (answers.okOpenEditor) {
+      require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
+        if (answer.yes) {
           launchEditor(WORKSPACE_PATH, () => {
             console.log('TODO: read user submitted answers');
             console.log('TODO: check answers');

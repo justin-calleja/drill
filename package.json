@@ -17,6 +17,7 @@
     "@justinc/drill-conf": ">0.0.1",
     "@justinc/launch-editor": "^1.0.0",
     "@justinc/prompt-del": "^1.0.0",
+    "@justinc/yesno": "^1.0.0",
     "archy": "^1.0.0",
     "async": "^2.0.1",
     "bunyan": "^1.8.1",
