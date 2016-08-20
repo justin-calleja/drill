@@ -1,4 +1,3 @@
-var levelup = require('level');
 var fs = require('fs');
 var dirs = require('@justinc/dirs').dirs;
 const DEFAULT_MATERIAL_DIR_NAME = require('@justinc/drill-conf').defaultMaterialDirName;
@@ -8,22 +7,7 @@ var path = require('path');
 var glob = require('glob');
 var R = require('ramda');
 
-const DB_PATH = getOrDie('db.path');
 const CONTAINER_PATHS = getOrDie('container.paths');
-
-var db = levelup(DB_PATH);
-
-process.on('exit', (_code) => {
-  db.close();
-});
-process.on('SIGINT', () => {
-  db.close();
-});
-process.on('uncaughtException', (err) => {
-  console.log(err);
-  db.close();
-  process.exit(1);
-});
 
 /**
  * @param  {string} absPath    The absolute path to look for JSON files in
