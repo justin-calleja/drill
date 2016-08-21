@@ -7,7 +7,7 @@
     "drill": "src/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha ./test/index.js"
   },
   "author": "Justin Calleja <calleja.justin@gmail.com>",
   "license": "ISC",
@@ -16,10 +16,13 @@
     "@justinc/dirs": "^1.0.0",
     "@justinc/drill-conf": ">0.0.1",
     "@justinc/launch-editor": "^1.0.0",
+    "@justinc/no-op-logger": "^1.0.0",
     "@justinc/prompt-del": "^1.0.0",
     "@justinc/yesno": "^1.0.0",
+    "JSONStream": "^1.1.4",
     "archy": "^1.0.0",
     "async": "^2.0.1",
+    "bluebird": "^3.4.1",
     "bunyan": "^1.8.1",
     "chalk": "^1.1.3",
     "columnify": "^1.5.4",
@@ -31,10 +34,13 @@
     "mkdirp": "^0.5.1",
     "moment": "^2.14.1",
     "ramda": "^0.22.0",
+    "through2": "^2.0.1",
     "yargs": "^4.8.1"
   },
   "devDependencies": {
     "@justinc/eslint-config-base": "^1.0.0",
-    "eslint": "^2.8.0"
+    "chai": "^3.5.0",
+    "eslint": "^2.8.0",
+    "mocha": "^3.0.2"
   }
 }

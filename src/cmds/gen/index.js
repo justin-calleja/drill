@@ -3,6 +3,7 @@ var async = require('async');
 var del = require('del');
 var bunyan = require('bunyan');
 var path = require('path');
+var pickItems = require('./pickItems');
 
 const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
 const LAST_GEN_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
@@ -26,32 +27,37 @@ module.exports = function _gen(argv) {
   }, function(err, results) {
     if (err) throw err;
 
-    console.log('results.getReadableStreams:', results.getReadableStreams);
-    // [
-    //   [ '/Users/justin/default-drill-material-container', [ [Object], [Object] ] ]
-    // ]
+    // console.log('results.getReadableStreams:', results.getReadableStreams);
 
-    if (argv.editorNo) {
-      console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
-    } else if (argv.editorYes) {
-      launchEditor(WORKSPACE_PATH, () => {
-        console.log('TODO: read user submitted answers');
-        console.log('TODO: check answers');
-        console.log('TODO: write data to keep track of what was asked, when, and how the user did');
-      });
-    } else {
-      require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
-        if (answer.yes) {
+    pickItems({ logger: log, streams: results.getReadableStreams })
+      .then(pickItemsResult => {
+        console.log('pickItemsResult:', pickItemsResult);
+
+        if (argv.editorNo) {
+          console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+        } else if (argv.editorYes) {
           launchEditor(WORKSPACE_PATH, () => {
             console.log('TODO: read user submitted answers');
             console.log('TODO: check answers');
             console.log('TODO: write data to keep track of what was asked, when, and how the user did');
           });
         } else {
-          console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+          require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
+            if (answer.yes) {
+              launchEditor(WORKSPACE_PATH, () => {
+                console.log('TODO: read user submitted answers');
+                console.log('TODO: check answers');
+                console.log('TODO: write data to keep track of what was asked, when, and how the user did');
+              });
+            } else {
+              console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+            }
+          });
         }
+      })
+      .catch(err => {
+        console.log('\n', err.message, '\n');
+        process.exit(1);
       });
-    }
-
   });
 };
