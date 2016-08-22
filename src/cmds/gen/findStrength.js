@@ -2,6 +2,7 @@ var moment = require('moment');
 var Promise = require('bluebird');
 var noOpLogger = require('@justinc/no-op-logger');
 var drillMeta = require('@justinc/drill-conf').drillMeta;
+var R = require('ramda');
 
 function calculateStrengthByNumberOfTimesAsked(value, points) {
   return value * points;
@@ -28,12 +29,9 @@ const DEFAULTS = {
   }
 };
 
-// var winston = require('winston');
-// var path = require('path');
-// const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
-// const LAST_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
-// winston.add(winston.transports.File, { filename: path.join(DRILL_DIR_PATH, LAST_RUN_LOG_FILE_NAME) });
-// winston.remove(winston.transports.Console);
+function _logStrength(logger, id, msg, points) {
+  logger.trace({ points: true }, `Item with id '${id}', ${msg}, got strength of: ${points}`);
+}
 
 /**
  * @param  {[type]} opts     Options
@@ -45,53 +43,50 @@ module.exports = (opts, db, item) => {
   opts = Object.assign({}, DEFAULTS, opts);
   var logger = opts.logger;
 
+  const ID = item.getId();
+  var logStrength = R.curry(_logStrength)(logger, ID);
+
   return new Promise((resolve) => {
-    const ID = item.getId();
     db.get(ID, (err, value) => {
       if (err) {
         logger.info(`Item with id '${ID}' was not found in db`);
-        resolve(0);
-        return;
+        return resolve(0);
       }
       logger.debug(`Item with id '${ID}': ${value}`);
 
       if (!value[drillMeta]) {
         logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}' - cannot calculate strength`);
-        resolve(NaN);
-        return;
+        return resolve(NaN);
       }
 
-      const NUMBER_OF_TIMES_ASKED = value[drillMeta].numberOfTimesAsked;
-      const LAST_ANSWER_WAS_CORRECT = value[drillMeta].lastAnswerWasCorrect;
-      const LAST_ASKED_TIME = value[drillMeta].lastAskedTime;
+      const { numberOfTimesAsked, lastAnswerWasCorrect, lastAskedTime } = value[drillMeta];
 
-      if (!NUMBER_OF_TIMES_ASKED) {
+      if (!numberOfTimesAsked) {
         logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.numberOfTimesAsked' - cannot calculate strength`);
-        resolve(NaN);
-        return;
+        return resolve(NaN);
       }
-      if (!LAST_ANSWER_WAS_CORRECT) {
+      if (!lastAnswerWasCorrect) {
         logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.lastAnswerWasCorrect' - cannot calculate strength`);
-        resolve(NaN);
-        return;
+        return resolve(NaN);
       }
-      if (!LAST_ASKED_TIME) {
+      if (!lastAskedTime) {
         logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.lastAskedTime' - cannot calculate strength`);
-        resolve(NaN);
-        return;
+        return resolve(NaN);
       }
 
-      var s1 = calculateStrengthByNumberOfTimesAsked(NUMBER_OF_TIMES_ASKED, opts.points['numberOfTimesAsked']);
-      logger.trace({ points: true }, `Item with id '${ID}', based on number of times asked, got strength of: ${s1}`);
-      var s2 = calculateStrengthByLastAnswerWasCorrect(LAST_ANSWER_WAS_CORRECT, opts.points['lastAnswerWasCorrect']);
-      logger.trace({ points: true }, `Item with id '${ID}', based on last answer was correct, got strength of: ${s2}`);
-      var s3 = calculateStrengthByLastAskedTime(LAST_ASKED_TIME, opts.points['lastAskedTime']);
-      logger.trace({ points: true }, `Item with id '${ID}', based on last asked time, got strength of: ${s3}`);
+      return R.compose(
+        resolve,
+        R.tap(strength => logger.debug({ points: true }, `Item with id '${ID}' got total strength of: ${strength}`)),
+        R.sum
+      )([
+        R.tap(logStrength('based on number of times asked'),
+          calculateStrengthByNumberOfTimesAsked(numberOfTimesAsked, opts.points['numberOfTimesAsked'])),
+        R.tap(logStrength('based on last answer was correct'),
+          calculateStrengthByLastAnswerWasCorrect(lastAnswerWasCorrect, opts.points['lastAnswerWasCorrect'])),
+        R.tap(logStrength('based on last asked time'),
+          calculateStrengthByLastAskedTime(lastAskedTime, opts.points['lastAskedTime']))
+      ]);
 
-      var strength = s1 + s2 + s3;
-      logger.debug({ points: true }, `Item with id '${ID}' got total strength of: ${strength}`);
-
-      resolve(strength);
     });
   });
 
