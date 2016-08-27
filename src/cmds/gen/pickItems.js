@@ -1,13 +1,13 @@
 const path = require('path');
-var levelup = require('level');
-var getOrDie = require('@justinc/drill-conf').getOrDie;
-var noOpLogger = require('@justinc/no-op-logger');
-var JSONStream = require('JSONStream');
-var Promise = require('bluebird');
-var curriedFindStrength = require('ramda').curry(require('./findStrength'));
-var through = require('through2');
-var Item = require('./Item');
-var ItemCache = require('./ItemCache');
+const levelup = require('level');
+const getOrDie = require('@justinc/drill-conf').getOrDie;
+const noOpLogger = require('@justinc/no-op-logger');
+const JSONStream = require('JSONStream');
+const Promise = require('bluebird');
+const curriedFindStrength = require('ramda').curry(require('./findStrength'));
+const through = require('through2');
+const Item = require('./Item');
+const ItemCache = require('./ItemCache');
 
 const DB_PATH = getOrDie('db.path');
 var db = levelup(DB_PATH);
@@ -47,7 +47,11 @@ module.exports = (opts) => {
 
     var addToCachePromises = itemStreams.map(itemStream => {
       return new Promise((itemStreamResolve, itemStreamReject) => {
-        itemStream.on('data', (item) => findStrength(item).then(s => cache.add(item.strength(s))));
+        itemStream.on('data', (item) => findStrength(item).then(s => {
+          // TODO: cache.handle needs to be implemented.
+          cache.examineResultHandler(cache.examine(item.strength(s)));
+          // cache.add(item.strength(s));
+        }));
         itemStream.on('end', itemStreamResolve);
         itemStream.on('close', itemStreamResolve);
         itemStream.on('error', itemStreamReject);
