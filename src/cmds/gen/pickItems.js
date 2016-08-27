@@ -24,15 +24,15 @@ process.on('uncaughtException', (err) => {
 });
 
 const DEFAULTS = {
-  logger: noOpLogger
+  log: noOpLogger
 };
 
 module.exports = (opts) => {
   opts = Object.assign({}, DEFAULTS, opts);
-  const findStrength = curriedFindStrength({ logger: opts.logger }, db);
+  const findStrength = curriedFindStrength({ log: opts.log }, db);
 
   return new Promise((resolve, reject) => {
-    var cache = new ItemCache();
+    var cache = new ItemCache({ log: opts.log });
 
     if (!opts.streams || (opts.streams.length && opts.streams.length === 0) ) {
       reject(new Error('Cannot generate drill with no streams to read from'));
@@ -48,9 +48,7 @@ module.exports = (opts) => {
     var addToCachePromises = itemStreams.map(itemStream => {
       return new Promise((itemStreamResolve, itemStreamReject) => {
         itemStream.on('data', (item) => findStrength(item).then(s => {
-          // TODO: cache.handle needs to be implemented.
           cache.examineResultHandler(cache.examine(item.strength(s)));
-          // cache.add(item.strength(s));
         }));
         itemStream.on('end', itemStreamResolve);
         itemStream.on('close', itemStreamResolve);
@@ -76,7 +74,7 @@ module.exports = (opts) => {
       // .forEach(stream => {
       //   stream.on('data', function(data) {
       //     var item = new Item(data.item, data.parsedPath);
-      //     findStrength(db, item, { logger: opts.logger })
+      //     findStrength(db, item, { log: opts.log })
       //       .then(strengthPoints => {
       //         item.strength(strengthPoints);
       //       });

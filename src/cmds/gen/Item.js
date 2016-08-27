@@ -1,4 +1,3 @@
-var drillMeta = require('@justinc/drill-conf').drillMeta;
 const path = require('path');
 var generateId = require('./generateId');
 

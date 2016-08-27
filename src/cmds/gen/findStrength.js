@@ -21,7 +21,7 @@ function calculateStrengthByLastAskedTime(value, daysAndPoints) {
 }
 
 const DEFAULTS = {
-  logger: noOpLogger,
+  log: noOpLogger,
   points: {
     numberOfTimesAsked: 0.5,
     lastAnswerWasCorrect: [2, -2],
@@ -29,8 +29,8 @@ const DEFAULTS = {
   }
 };
 
-function _logStrength(logger, id, msg, points) {
-  logger.trace({ points: true }, `Item with id '${id}', ${msg}, got strength of: ${points}`);
+function _logStrength(log, id, msg, points) {
+  log.trace({ points: true }, `Item with id '${id}', ${msg}, got strength of: ${points}`);
 }
 
 /**
@@ -41,42 +41,42 @@ function _logStrength(logger, id, msg, points) {
  */
 module.exports = (opts, db, item) => {
   opts = Object.assign({}, DEFAULTS, opts);
-  var logger = opts.logger;
+  var log = opts.log;
 
   const ID = item.getId();
-  var logStrength = R.curry(_logStrength)(logger, ID);
+  var logStrength = R.curry(_logStrength)(log, ID);
 
   return new Promise((resolve) => {
     db.get(ID, (err, value) => {
       if (err) {
-        logger.info(`Item with id '${ID}' was not found in db`);
+        log.info(`Item with id '${ID}' was not found in db`);
         return resolve(0);
       }
-      logger.debug(`Item with id '${ID}': ${value}`);
+      log.debug(`Item with id '${ID}': ${value}`);
 
       if (!value[drillMeta]) {
-        logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}' - cannot calculate strength`);
+        log.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}' - cannot calculate strength`);
         return resolve(NaN);
       }
 
       const { numberOfTimesAsked, lastAnswerWasCorrect, lastAskedTime } = value[drillMeta];
 
       if (!numberOfTimesAsked) {
-        logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.numberOfTimesAsked' - cannot calculate strength`);
+        log.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.numberOfTimesAsked' - cannot calculate strength`);
         return resolve(NaN);
       }
       if (!lastAnswerWasCorrect) {
-        logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.lastAnswerWasCorrect' - cannot calculate strength`);
+        log.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.lastAnswerWasCorrect' - cannot calculate strength`);
         return resolve(NaN);
       }
       if (!lastAskedTime) {
-        logger.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.lastAskedTime' - cannot calculate strength`);
+        log.error({ [drillMeta]: false }, `Item with id '${ID}' has no '${drillMeta}.lastAskedTime' - cannot calculate strength`);
         return resolve(NaN);
       }
 
       return R.compose(
         resolve,
-        R.tap(strength => logger.debug({ points: true }, `Item with id '${ID}' got total strength of: ${strength}`)),
+        R.tap(strength => log.debug({ points: true }, `Item with id '${ID}' got total strength of: ${strength}`)),
         R.sum
       )([
         R.tap(logStrength('based on number of times asked'),

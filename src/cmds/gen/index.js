@@ -29,7 +29,7 @@ module.exports = function _gen(argv) {
 
     // console.log('results.getReadableStreams:', results.getReadableStreams);
 
-    pickItems({ logger: log, streams: results.getReadableStreams })
+    pickItems({ log, streams: results.getReadableStreams })
       .then(pickItemsResult => {
         console.log('pickItemsResult:', pickItemsResult);
 
