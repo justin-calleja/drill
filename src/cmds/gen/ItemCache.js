@@ -1,6 +1,5 @@
 var noOpLogger = require('@justinc/no-op-logger');
 var SortedArray = require('sorted-array');
-var chance = require('chance').Chance();
 var { curry } = require('ramda');
 
 // TODO: maybe consider a state machine for this class?
@@ -29,7 +28,7 @@ const DEFAULT_HANDLERS = {
   },
   // 2
   cacheIsFullAndItemAsStrongAsStrongest: (cache, item) => {
-    if (chance.bool()) {
+    if (Math.floor((Math.random() * 2) + 1) === 1) {
       var strongestItem = cache.getStrongest();
       if (strongestItem) {
         cache.replaceStrongest(item);
