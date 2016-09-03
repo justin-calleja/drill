@@ -2,8 +2,6 @@ var noOpLogger = require('@justinc/no-op-logger');
 var SortedArray = require('sorted-array');
 var { curry } = require('ramda');
 
-// TODO: maybe consider a state machine for this class?
-
 const DEFAULT_COMPARE_FN = (itemA, itemB) => {
   if (itemA.getStrength() < itemB.getStrength()) return -1;
   if (itemA.getStrength() > itemB.getStrength()) return 1;
@@ -58,10 +56,8 @@ class ItemCache {
     this.handlers = Object.assign({}, DEFAULT_HANDLERS, handlers);
     const self = this;
     Object.keys(this.handlers).forEach(key => {
-      // this.handlers[key] = this.handlers[key].bind(this);
       self.handlers[key] = curry(self.handlers[key])(self);
     });
-    // debugger;
     this.handlersAsArray = [
       this.handlers.cacheIsNotFull,
       this.handlers.cacheIsFullAndItemStrongest,

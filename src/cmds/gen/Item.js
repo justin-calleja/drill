@@ -26,6 +26,14 @@ class Item {
     return this.nonFileData.strength || 0;
   }
 
+  getQuestion() {
+    return this.fileData.question;
+  }
+
+  getDelegate() {
+    return this.fileData.answer.delegate;
+  }
+
   getFileData() {
     return this.fileData;
   }

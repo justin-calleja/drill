@@ -4,6 +4,9 @@ var del = require('del');
 var bunyan = require('bunyan');
 var path = require('path');
 var pickItems = require('./pickItems');
+var genQuestions = require('./genQuestions');
+const fs = require('fs');
+const Promise = require('bluebird');
 
 const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
 const LAST_GEN_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
@@ -21,33 +24,31 @@ module.exports = function _gen(argv) {
   });
   log.info(`Logging level is: ${argv.logLevel}`);
 
-  async.parallel({
-    resetWorkspace: (cb) => require('./resetWorkspace')(log, cb),
-    getReadableStreams: (cb) => require('./getReadableStreams')(log, cb)
-  }, function(err, results) {
-    if (err) throw err;
+  // async.parallel({
+  //   resetWorkspace: (cb) => require('./resetWorkspace')(log, cb),
+  //   getReadableStreams: (cb) => require('./getReadableStreams')(log, cb)
+  // }, function(err, results) {
+  Promise.join(
+    require('./resetWorkspace')(log),
+    require('./getReadableStreams')(log, cb),
+    function(resetWorkspaceResult, getReadableStreamsResult) {
 
-    // console.log('results.getReadableStreams:', results.getReadableStreams);
-
-    pickItems({ log, streams: results.getReadableStreams })
-      .then(pickItemsResult => {
-        console.log('pickItemsResult:', pickItemsResult);
+      pickItems({ log, streams: results.getReadableStreams })
+      .then(items => genQuestions(items, log))
+      .then(questionsAsStr => {
+        fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
 
         if (argv.editorNo) {
           console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
         } else if (argv.editorYes) {
           launchEditor(WORKSPACE_PATH, () => {
-            console.log('TODO: read user submitted answers');
-            console.log('TODO: check answers');
-            console.log('TODO: write data to keep track of what was asked, when, and how the user did');
+            console.log('TODO: show user which command can be used to check results');
           });
         } else {
           require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
             if (answer.yes) {
               launchEditor(WORKSPACE_PATH, () => {
-                console.log('TODO: read user submitted answers');
-                console.log('TODO: check answers');
-                console.log('TODO: write data to keep track of what was asked, when, and how the user did');
+                console.log('TODO: show user which command can be used to check results');
               });
             } else {
               console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
@@ -59,5 +60,16 @@ module.exports = function _gen(argv) {
         console.log('\n', err.message, '\n');
         process.exit(1);
       });
-  });
+
+    })
+    .catch(err => console.log(err.message));
+    // if (err) throw err;
+
+        // pickItemsResult => {
+        // // console.log('pickItemsResult:', pickItemsResult);
+        // pickItemsResult.forEach(result => {
+        //   console.log(Object.keys(result.fileData));
+        //   console.log('question:', result.getFileData().question);
+        // });
+  // });
 };
