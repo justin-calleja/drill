@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@justinc/dir-exists": "^2.0.0",
-    "@justinc/dirs": "^1.0.0",
+    "@justinc/dirs-as-promised": "^1.0.1",
     "@justinc/drill-conf": ">0.0.1",
     "@justinc/launch-editor": "^1.0.0",
     "@justinc/no-op-logger": "^1.0.0",

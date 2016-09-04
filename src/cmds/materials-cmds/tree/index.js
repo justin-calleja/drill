@@ -1,5 +1,4 @@
-var dirs = require('@justinc/dirs').dirs;
-var async = require('async');
+var dirs = require('@justinc/dirs-as-promised');
 var getOrDie = require('@justinc/drill-conf').getOrDie;
 var archy = require('archy');
 
@@ -7,13 +6,13 @@ const CONTAINER_PATHS = getOrDie('container.paths');
 
 module.exports = () => {
 
-  async.map(CONTAINER_PATHS, dirs, (err, results) => {
-    if (err) throw err;
-    CONTAINER_PATHS.forEach((materialPath, i) => {
-      console.log(archy({
-        label: materialPath,
-        nodes: results[i]
-      }));
+  Promise.all(CONTAINER_PATHS.map(dirs)).then(results => {
+    return Promise.resolve(CONTAINER_PATHS.map((containerPath, index) => ({
+      label: containerPath,
+      nodes: results[index]
+    })))
+    .then(nodes => {
+      nodes.forEach(node => console.log(archy(node)));
     });
   });
 

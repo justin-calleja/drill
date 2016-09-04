@@ -1,7 +1,6 @@
 var fs = require('fs');
-var dirs = require('@justinc/dirs').dirs;
+var dirs = require('@justinc/dirs-as-promised');
 const DEFAULT_MATERIAL_DIR_NAME = require('@justinc/drill-conf').defaultMaterialDirName;
-var async = require('async');
 var getOrDie = require('@justinc/drill-conf').getOrDie;
 var path = require('path');
 var glob = require('glob');
@@ -26,14 +25,11 @@ function syncGetAllJSONFileNamesOrDie(absPath) {
 
 /**
  * @param  {[type]}   log [description]
- * @param  {Function} cb  [description]
  * @return {[type]}       [description]
  */
-module.exports = (log, cb) => {
+module.exports = (log) => {
 
-  async.map(CONTAINER_PATHS, dirs, (err, results) => {
-    if (err) return cb(err);
-
+  return Promise.all(CONTAINER_PATHS.map(dirs)).then(results => {
     var syncGetReadableStreams = R.compose(
       R.map(fs.createReadStream),
       R.chain(([ absPath, fileNames ]) => fileNames.map(name => path.join(absPath, name))),
@@ -49,7 +45,7 @@ module.exports = (log, cb) => {
       R.zipWith((a, b) => [a, b])
     );
 
-    return cb(null, syncGetReadableStreams(CONTAINER_PATHS, results));
+    return syncGetReadableStreams(CONTAINER_PATHS, results);
   });
 
 };
