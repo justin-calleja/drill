@@ -10,7 +10,7 @@ const CONTAINER_PATHS = getOrDie('container.paths');
 
 /**
  * @param  {string} absPath    The absolute path to look for JSON files in
- * @return {Mabye([string])}   An array of filenames
+ * @return {[string]}   An array of filenames
  */
 function syncGetAllJSONFileNamesOrDie(absPath) {
   var fileNames = null;
@@ -28,6 +28,7 @@ function syncGetAllJSONFileNamesOrDie(absPath) {
  * @return {[type]}       [description]
  */
 module.exports = (log) => {
+  log.trace('Getting readable streams');
 
   return Promise.all(CONTAINER_PATHS.map(dirs)).then(results => {
     var syncGetReadableStreams = R.compose(

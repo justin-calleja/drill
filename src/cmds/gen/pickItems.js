@@ -52,16 +52,12 @@ module.exports = (opts) => {
         cache.examineResultHandler(cache.examine(item.strength(s)));
       }));
       itemStream.on('end', () => {
-        // console.log('cache.getItems():', cache.getItems());
-        console.log('end of item stream:');
         itemStreamResolve();
       });
       itemStream.on('close', () => {
-        console.log('close of item stream:');
         itemStreamResolve();
       });
       itemStream.on('error', () => {
-        console.log('errpr of item stream:');
         itemStreamReject();
       });
     });

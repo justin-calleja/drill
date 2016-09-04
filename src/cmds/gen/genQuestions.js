@@ -1,7 +1,6 @@
 const Promise = require('bluebird');
 
 function handle(delegate, item) {
-  console.log('delegate:', delegate);
   if (delegate === 'one-of') {
     return item.getQuestion();
   } else if (delegate === 'confirm') {

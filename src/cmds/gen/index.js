@@ -1,5 +1,5 @@
 var launchEditor = require('@justinc/launch-editor');
-var async = require('async');
+// var async = require('async');
 var del = require('del');
 var bunyan = require('bunyan');
 var path = require('path');
@@ -28,41 +28,45 @@ module.exports = function _gen(argv) {
   //   resetWorkspace: (cb) => require('./resetWorkspace')(log, cb),
   //   getReadableStreams: (cb) => require('./getReadableStreams')(log, cb)
   // }, function(err, results) {
-  Promise.join(
+  // Promise.join(
+  Promise.all([
     require('./resetWorkspace')(log),
-    require('./getReadableStreams')(log, cb),
-    function(resetWorkspaceResult, getReadableStreamsResult) {
-
-      pickItems({ log, streams: results.getReadableStreams })
-      .then(items => genQuestions(items, log))
-      .then(questionsAsStr => {
-        fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
-
-        if (argv.editorNo) {
-          console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
-        } else if (argv.editorYes) {
-          launchEditor(WORKSPACE_PATH, () => {
-            console.log('TODO: show user which command can be used to check results');
-          });
-        } else {
-          require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
-            if (answer.yes) {
-              launchEditor(WORKSPACE_PATH, () => {
-                console.log('TODO: show user which command can be used to check results');
-              });
-            } else {
-              console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
-            }
-          });
-        }
-      })
-      .catch(err => {
-        console.log('\n', err.message, '\n');
-        process.exit(1);
-      });
-
+    require('./getReadableStreams')(log)
+  ])
+    .then(([_resetWorkspaceResult, getReadableStreamsResult]) => {
+    // console.log('getReadableStreamsResult.length:', getReadableStreamsResult.length);
+      return pickItems({ log, streams: getReadableStreamsResult });
     })
-    .catch(err => console.log(err.message));
+    .then(items => genQuestions(items, log))
+    .then(questionsAsStr => {
+      fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
+
+      if (argv.editorNo) {
+        console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+      } else if (argv.editorYes) {
+        launchEditor(WORKSPACE_PATH, () => {
+          console.log('TODO: show user which command can be used to check results');
+        });
+      } else {
+        require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
+          if (answer.yes) {
+            launchEditor(WORKSPACE_PATH, () => {
+              console.log('TODO: show user which command can be used to check results');
+            });
+          } else {
+            console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+          }
+        });
+      }
+    })
+    .catch(err => {
+      console.log('\n', err.message, '\n');
+      process.exit(1);
+    });
+
+  // ----------------------------------------------------
+
+    // .catch(err => console.log(err.message));
     // if (err) throw err;
 
         // pickItemsResult => {
