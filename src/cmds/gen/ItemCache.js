@@ -11,14 +11,14 @@ const DEFAULT_OPTS = {
     return 0;
   },
   handlers: {
-    cacheIsNotFull: (cache, item) => {
+    notFull: (cache, item) => {
       cache.addItem(item);
       cache.log.trace(`Added in cache: '${item.getId()}'`);
     },
-    cacheIsFullAndItemStrongest: (cache, item) => {
+    fullAndStrongest: (cache, item) => {
       cache.log.trace(`Too strong to be added in cache: '${item.getId()}'`);
     },
-    cacheIsFullAndItemAsStrongAsStrongest: (cache, item) => {
+    fullAndStrongAsStrongest: (cache, item) => {
       if (Math.floor((Math.random() * 2) + 1) === 1) {
         var strongestItem = cache.getStrongest();
         if (strongestItem) {
@@ -29,7 +29,7 @@ const DEFAULT_OPTS = {
         cache.log.trace(`Skipping '${item.getId()}': as strong as strongest`);
       }
     },
-    cacheIsFullAndItemNotStrongest: (cache, item) => {
+    fullAndNotStrongest: (cache, item) => {
       var strongestItem = cache.getStrongest();
       if (strongestItem) {
         cache.replaceStrongest(item);
@@ -91,19 +91,19 @@ class ItemCache {
   /**
    * Returns an array of size 2 with given Item as the 2nd element.
    * The first element is one of the following strings:
-   * - 'cacheIsNotFull'
-   * - 'cacheIsFullAndItemStrongest'
-   * - 'cacheIsFullAndItemAsStrongAsStrongest'
-   * - 'cacheIsFullAndItemNotStrongest'
+   * - 'notFull'
+   * - 'fullAndStrongest'
+   * - 'fullAndStrongAsStrongest'
+   * - 'fullAndNotStrongest'
    * - 'invalid'
    * @param  {Item} item
    * @return {[string, Item]}
    */
   examine(item) {
-    if (this.getSize() < this.getMax()) return ['cacheIsNotFull', item];
-    if (item.getStrength() > this.getStrongest().getStrength()) return ['cacheIsFullAndItemStrongest', item];
-    if (item.getStrength() === this.getStrongest().getStrength()) return ['cacheIsFullAndItemAsStrongAsStrongest', item];
-    if (item.getStrength() < this.getStrongest().getStrength()) return ['cacheIsFullAndItemNotStrongest', item];
+    if (this.getSize() < this.getMax()) return ['notFull', item];
+    if (item.getStrength() > this.getStrongest().getStrength()) return ['fullAndStrongest', item];
+    if (item.getStrength() === this.getStrongest().getStrength()) return ['fullAndStrongAsStrongest', item];
+    if (item.getStrength() < this.getStrongest().getStrength()) return ['fullAndNotStrongest', item];
     return ['invalid', item];
   }
 
