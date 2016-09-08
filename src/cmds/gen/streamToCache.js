@@ -27,9 +27,9 @@ module.exports = (opts) => {
       cb();
     }));
 
-    itemStream.on('data', (item) => findStrength(item).then(s => {
-      cache.examineResultHandler(cache.examine(item.strength(s)));
-    }));
+    itemStream.on('data', (item) => {
+      findStrength(item).then(s => cache.input(item.strength(s)));
+    });
     itemStream.on('end', () => {
       resolve(cache);
     });

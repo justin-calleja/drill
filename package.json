@@ -7,7 +7,14 @@
     "drill": "src/index.js"
   },
   "scripts": {
-    "test": "mocha ./test/index.js"
+    "lint": "eslint ./src ./test",
+    "test": "ava"
+  },
+  "ava": {
+    "files": [
+      "test/**/*.test.js"
+    ],
+    "failFast": true
   },
   "author": "Justin Calleja <calleja.justin@gmail.com>",
   "license": "ISC",
@@ -41,9 +48,9 @@
     "yargs": "^4.8.1"
   },
   "devDependencies": {
-    "@justinc/eslint-config-base": "^1.0.0",
-    "chai": "^3.5.0",
-    "eslint": "^2.8.0",
-    "mocha": "^3.0.2"
+    "@justinc/eslint-config-base": "^1.0.3",
+    "ava": "^0.16.0",
+    "babel-eslint": "^6.1.2",
+    "eslint": "^2.8.0"
   }
 }

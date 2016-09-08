@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "extends": "@justinc/eslint-config-base",
   "env": {
     "node": true,
