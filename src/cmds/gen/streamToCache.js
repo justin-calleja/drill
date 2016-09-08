@@ -23,22 +23,17 @@ module.exports = (opts) => {
     var cache = new ItemCache({ log: opts.log });
 
     const itemStream = stream.pipe(JSONStream.parse()).pipe(through.obj(function(parsedObj, _, cb) {
-      this.push(new Item(parsedObj, path.parse(stream.path)));
-      cb();
+      var item = new Item(parsedObj, path.parse(stream.path));
+      findStrength(item).then(s => {
+        this.push(item.strength(s));
+        cb();
+      });
     }));
 
-    itemStream.on('data', (item) => {
-      findStrength(item).then(s => cache.input(item.strength(s)));
-    });
-    itemStream.on('end', () => {
-      resolve(cache);
-    });
-    itemStream.on('close', () => {
-      resolve(cache);
-    });
-    itemStream.on('error', (err) => {
-      reject(err);
-    });
+    itemStream.on('data', item => cache.input(item));
+    itemStream.on('end', () => resolve(cache));
+    itemStream.on('close', () => resolve(cache));
+    itemStream.on('error', err => reject(err));
   });
 
 };

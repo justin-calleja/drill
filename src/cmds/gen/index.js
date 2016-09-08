@@ -34,12 +34,7 @@ module.exports = function _gen(argv) {
       );
     })
     .then(caches => {
-      // caches.forEach(cache => {
-      //   console.log('cache.getSortedItems():', cache.getSortedItems());
-      // });
-      // console.log('caches:', caches);
       var mergedCache = caches.reduce((acc, cache) => acc.merge(cache));
-      // console.log('mergedCache:', mergedCache);
       return genQuestions(mergedCache.getSortedItems(), log);
     })
     // .then(result => {
