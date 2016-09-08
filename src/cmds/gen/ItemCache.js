@@ -108,13 +108,18 @@ class ItemCache {
   }
 
   /**
-   * The main interface with the outside world.
-   * This method is used to add items to the cache in the designed way.
+   * This method is used to add items to the cache in the designed way
+   * (i.e. following the cache's rules for item addition)
    * @param  {Item} item
    * @return {ItemCache}
    */
   input(item) {
     this.examineResultHandler(this.examine(item));
+  }
+
+  merge(cache) {
+    cache.getSortedItems().forEach(this.input.bind(this));
+    return this;
   }
 
 }

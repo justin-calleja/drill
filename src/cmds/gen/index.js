@@ -34,13 +34,19 @@ module.exports = function _gen(argv) {
       );
     })
     .then(caches => {
-
+      // caches.forEach(cache => {
+      //   console.log('cache.getSortedItems():', cache.getSortedItems());
+      // });
+      // console.log('caches:', caches);
+      var mergedCache = caches.reduce((acc, cache) => acc.merge(cache));
+      // console.log('mergedCache:', mergedCache);
+      return genQuestions(mergedCache.getSortedItems(), log);
     })
-    .then(result => {
-      // console.log('result is:', result);
-      return result[0];
-    })
-    .then(cache => genQuestions(cache.getSortedItems(), log))
+    // .then(result => {
+    //   // console.log('result is:', result);
+    //   return result[0];
+    // })
+    // .then(cache => genQuestions(cache.getSortedItems(), log))
     // .then(items => genQuestions(items, log))
     .then(questionsAsStr => {
       fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
