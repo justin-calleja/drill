@@ -12,14 +12,16 @@ function handle(delegate, item) {
 
 module.exports = (items, log) => {
 
-  log.debug(`Generating questions with item ids: ${items.map(item => item.getId()).join(', ')}`);
-  // console.log(JSON.stringify(items, null, 2));
+  return new Promise((resolve, _reject) => {
+    log.debug(`Generating questions with item ids: ${items.map(item => item.getId()).join(', ')}`);
 
-  var mappedItems = items.map(item => {
-    return handle(item.getDelegate(), item);
+    var mappedItems = items.map(item => {
+      return handle(item.getDelegate(), item);
+    });
+
+    // using Promises because async ops could happen here in the future if delegate
+    // implementations are e.g. read from file.
+    return resolve(mappedItems.join('\n\n'));
   });
 
-  // using Promises because async ops could happen here in the future if delegate
-  // implementations are e.g. read from file.
-  return Promise.resolve(mappedItems.join('\n\n'));
 };

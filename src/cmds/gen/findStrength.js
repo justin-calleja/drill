@@ -74,7 +74,7 @@ module.exports = (opts, db, item) => {
         return resolve(NaN);
       }
 
-      return R.compose(
+      R.compose(
         resolve,
         R.tap(strength => log.debug({ points: true }, `Item with id '${ID}' got total strength of: ${strength}`)),
         R.sum

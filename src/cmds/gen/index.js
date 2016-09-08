@@ -1,12 +1,12 @@
 var launchEditor = require('@justinc/launch-editor');
-// var async = require('async');
 var del = require('del');
 var bunyan = require('bunyan');
 var path = require('path');
-var pickItems = require('./pickItems');
+var streamToCache = require('./streamToCache');
 var genQuestions = require('./genQuestions');
 const fs = require('fs');
 const Promise = require('bluebird');
+const db = require('./dbConnection');
 
 const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
 const LAST_GEN_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
@@ -24,20 +24,24 @@ module.exports = function _gen(argv) {
   });
   log.info(`Logging level is: ${argv.logLevel}`);
 
-  // async.parallel({
-  //   resetWorkspace: (cb) => require('./resetWorkspace')(log, cb),
-  //   getReadableStreams: (cb) => require('./getReadableStreams')(log, cb)
-  // }, function(err, results) {
-  // Promise.join(
   Promise.all([
     require('./resetWorkspace')(log),
     require('./getReadableStreams')(log)
   ])
     .then(([_resetWorkspaceResult, getReadableStreamsResult]) => {
-    // console.log('getReadableStreamsResult.length:', getReadableStreamsResult.length);
-      return pickItems({ log, streams: getReadableStreamsResult });
+      return Promise.all(
+        getReadableStreamsResult.map(stream => streamToCache({ log, stream, db }))
+      );
     })
-    .then(items => genQuestions(items, log))
+    .then(caches => {
+
+    })
+    .then(result => {
+      // console.log('result is:', result);
+      return result[0];
+    })
+    .then(cache => genQuestions(cache.getItems(), log))
+    // .then(items => genQuestions(items, log))
     .then(questionsAsStr => {
       fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
 

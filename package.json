@@ -18,7 +18,7 @@
     "@justinc/launch-editor": "^1.0.0",
     "@justinc/no-op-logger": "^1.0.0",
     "@justinc/prompt-del": "^1.0.0",
-    "@justinc/prompt-del-as-promised": "^1.0.0",
+    "@justinc/prompt-del-as-promised": "^1.1.0",
     "@justinc/yesno": "^1.0.0",
     "JSONStream": "^1.1.4",
     "archy": "^1.0.0",
