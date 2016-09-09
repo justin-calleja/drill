@@ -9,11 +9,14 @@ const Promise = require('bluebird');
 const db = require('./dbConnection');
 
 const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
+const QUIZ_FILE_NAME = require('@justinc/drill-conf').defaultQuizFileName;
 const LAST_GEN_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
 var getOrDie = require('@justinc/drill-conf').getOrDie;
 
 const WORKSPACE_PATH = getOrDie('workspace.path');
 const LOG_FILE_PATH = path.join(DRILL_DIR_PATH, LAST_GEN_RUN_LOG_FILE_NAME);
+
+const QUIZ_ABS_PATH = path.join(WORKSPACE_PATH, QUIZ_FILE_NAME);
 
 module.exports = function _gen(argv) {
 
@@ -38,22 +41,22 @@ module.exports = function _gen(argv) {
       return itemsToQuestionsAsString(mergedCache.getItems(), log);
     })
     .then(questionsAsStr => {
-      fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
+      fs.writeFileSync(QUIZ_ABS_PATH, questionsAsStr);
 
       if (argv.editorNo) {
-        console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+        console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
       } else if (argv.editorYes) {
         launchEditor(WORKSPACE_PATH, () => {
           console.log('TODO: show user which command can be used to check results');
         });
       } else {
-        require('@justinc/yesno')({ message: 'Do you want to open your editor in the workspace now?' }).then(answer => {
+        require('@justinc/yesno')({ message: 'Do you want to open the generated file in your editor now?' }).then(answer => {
           if (answer.yes) {
-            launchEditor(WORKSPACE_PATH, () => {
+            launchEditor(QUIZ_ABS_PATH, () => {
               console.log('TODO: show user which command can be used to check results');
             });
           } else {
-            console.log(`\nDone generating drill in ${WORKSPACE_PATH}\n`);
+            console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
           }
         });
       }
@@ -63,16 +66,4 @@ module.exports = function _gen(argv) {
       process.exit(1);
     });
 
-  // ----------------------------------------------------
-
-    // .catch(err => console.log(err.message));
-    // if (err) throw err;
-
-        // pickItemsResult => {
-        // // console.log('pickItemsResult:', pickItemsResult);
-        // pickItemsResult.forEach(result => {
-        //   console.log(Object.keys(result.fileData));
-        //   console.log('question:', result.getFileData().question);
-        // });
-  // });
 };

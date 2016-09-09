@@ -30,8 +30,8 @@ class Item {
     return this.fileData.question;
   }
 
-  getDelegate() {
-    return this.fileData.answer.delegate;
+  getAnswer() {
+    return this.fileData.answer;
   }
 
   getFileData() {
