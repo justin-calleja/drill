@@ -34,15 +34,9 @@ module.exports = function _gen(argv) {
       );
     })
     .then(caches => {
-      var mergedCache = caches.reduce((acc, cache) => acc.merge(cache));
-      return genQuestions(mergedCache.getSortedItems(), log);
+      var mergedCache = caches.reduce((acc, cache) => acc.takeItemsFrom(cache));
+      return genQuestions(mergedCache.getItems(), log);
     })
-    // .then(result => {
-    //   // console.log('result is:', result);
-    //   return result[0];
-    // })
-    // .then(cache => genQuestions(cache.getSortedItems(), log))
-    // .then(items => genQuestions(items, log))
     .then(questionsAsStr => {
       fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
 

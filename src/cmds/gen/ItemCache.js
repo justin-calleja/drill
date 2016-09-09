@@ -60,11 +60,12 @@ class ItemCache {
   }
 
   /**
+   * Client should not rely on items being sorted.
    * Items in array will be sorted according to cache's compareFn.
    * By default, stronger items will be before weaker ones in the array.
    * @return {Array<Item>}
    */
-  getSortedItems() {
+  getItems() {
     return this.items.array;
   }
 
@@ -117,8 +118,8 @@ class ItemCache {
     this.examineResultHandler(this.examine(item));
   }
 
-  merge(cache) {
-    cache.getSortedItems().forEach(this.input.bind(this));
+  takeItemsFrom(cache) {
+    cache.getItems().forEach(this.input.bind(this));
     return this;
   }
 
