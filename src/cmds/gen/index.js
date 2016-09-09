@@ -3,7 +3,7 @@ var del = require('del');
 var bunyan = require('bunyan');
 var path = require('path');
 var streamToCache = require('./streamToCache');
-var genQuestions = require('./genQuestions');
+var itemsToQuestionsAsString = require('./itemsToQuestionsAsString');
 const fs = require('fs');
 const Promise = require('bluebird');
 const db = require('./dbConnection');
@@ -35,7 +35,7 @@ module.exports = function _gen(argv) {
     })
     .then(caches => {
       var mergedCache = caches.reduce((acc, cache) => acc.takeItemsFrom(cache));
-      return genQuestions(mergedCache.getItems(), log);
+      return itemsToQuestionsAsString(mergedCache.getItems(), log);
     })
     .then(questionsAsStr => {
       fs.writeFileSync(path.join(WORKSPACE_PATH, 'questions.txt'), questionsAsStr);
