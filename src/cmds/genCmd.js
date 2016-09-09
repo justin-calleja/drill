@@ -1,5 +1,12 @@
+var del = require('del');
+var bunyan = require('bunyan');
+var path = require('path');
+const LOGS_DIR_PATH = require('@justinc/drill-conf').logsDirPath;
+const ensureDirExists = require('../ensureDirExists');
+const LOG_FILE_PATH = path.join(LOGS_DIR_PATH, 'last-gen-run.log');
+
 module.exports = {
-  command: 'gen [no-launch-editor]',
+  command: 'gen [opts]',
   desc: 'generates a new drill in the workspace',
   builder: {
     'editor-yes': {
@@ -13,5 +20,17 @@ module.exports = {
       'default': 'info'
     }
   },
-  handler: argv => require('./gen')(argv)
+  handler: argv => {
+    ensureDirExists(LOGS_DIR_PATH)
+      .then(() => del([ LOG_FILE_PATH ], { force: true }))
+      .then(() => {
+        var log = bunyan.createLogger({
+          name: 'drill-gen',
+          streams: [ { level: argv.logLevel, path: LOG_FILE_PATH } ]
+        });
+        log.info(`Logging level is: ${argv.logLevel}`);
+
+        require('./gen')(argv, { log });
+      });
+  }
 };

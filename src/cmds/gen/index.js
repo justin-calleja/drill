@@ -1,6 +1,5 @@
+var noOpLogger = require('@justinc/no-op-logger');
 var launchEditor = require('@justinc/launch-editor');
-var del = require('del');
-var bunyan = require('bunyan');
 var path = require('path');
 var streamToCache = require('./streamToCache');
 var itemsToQuestionsAsString = require('./itemsToQuestionsAsString');
@@ -8,24 +7,16 @@ const fs = require('fs');
 const Promise = require('bluebird');
 const db = require('./dbConnection');
 
-const DRILL_DIR_PATH = require('@justinc/drill-conf').drillDirPath;
 const QUIZ_FILE_NAME = require('@justinc/drill-conf').defaultQuizFileName;
-const LAST_GEN_RUN_LOG_FILE_NAME = require('@justinc/drill-conf').lastGenRunLogFileName;
 var getOrDie = require('@justinc/drill-conf').getOrDie;
 
 const WORKSPACE_PATH = getOrDie('workspace.path');
-const LOG_FILE_PATH = path.join(DRILL_DIR_PATH, LAST_GEN_RUN_LOG_FILE_NAME);
 
 const QUIZ_ABS_PATH = path.join(WORKSPACE_PATH, QUIZ_FILE_NAME);
 
-module.exports = function _gen(argv) {
+module.exports = function _gen(argv, opts) {
 
-  del.sync([ LOG_FILE_PATH ], { force: true });
-  var log = bunyan.createLogger({
-    name: 'drill-gen',
-    streams: [ { level: argv.logLevel, path: LOG_FILE_PATH } ]
-  });
-  log.info(`Logging level is: ${argv.logLevel}`);
+  var log = opts.log || noOpLogger;
 
   Promise.all([
     require('./resetWorkspace')(log),

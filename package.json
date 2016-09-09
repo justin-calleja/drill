@@ -16,6 +16,14 @@
     ],
     "failFast": true
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justin-calleja/drill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/justin-calleja/drill/issues"
+  },
+  "homepage": "https://github.com/justin-calleja/drill#readme",
   "author": "Justin Calleja <calleja.justin@gmail.com>",
   "license": "ISC",
   "dependencies": {
