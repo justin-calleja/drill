@@ -1,21 +1,20 @@
-var noOpLogger = require('@justinc/no-op-logger');
-var launchEditor = require('@justinc/launch-editor');
-var path = require('path');
-var streamToCache = require('./streamToCache');
-var itemsToQuestionsAsString = require('./itemsToQuestionsAsString');
+const noOpLogger = require('@justinc/no-op-logger');
+const launchEditor = require('@justinc/launch-editor');
+const path = require('path');
+const streamToCache = require('./streamToCache');
+const itemsToQuestionsAsString = require('./itemsToQuestionsAsString');
 const fs = require('fs');
 const Promise = require('bluebird');
-const db = require('./dbConnection');
+const db = require('../../dbConnection');
 
 const QUIZ_FILE_NAME = require('@justinc/drill-conf').defaultQuizFileName;
-var getOrDie = require('@justinc/drill-conf').getOrDie;
+const getOrDie = require('@justinc/drill-conf').getOrDie;
 
 const WORKSPACE_PATH = getOrDie('workspace.path');
 
 const QUIZ_ABS_PATH = path.join(WORKSPACE_PATH, QUIZ_FILE_NAME);
 
 module.exports = function _gen(argv, opts) {
-
   var log = opts.log || noOpLogger;
 
   Promise.all([
@@ -37,7 +36,7 @@ module.exports = function _gen(argv, opts) {
       if (argv.editorNo) {
         console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
       } else if (argv.editorYes) {
-        launchEditor(WORKSPACE_PATH, () => {
+        launchEditor(QUIZ_ABS_PATH, () => {
           console.log('TODO: show user which command can be used to check results');
         });
       } else {
