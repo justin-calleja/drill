@@ -6,6 +6,7 @@ const itemsToQuestionsAsString = require('./itemsToQuestionsAsString');
 const fs = require('fs');
 const Promise = require('bluebird');
 const db = require('../../dbConnection');
+const getReadableStreams = require('../../getReadableStreams');
 
 const QUIZ_FILE_NAME = require('@justinc/drill-conf').defaultQuizFileName;
 const getOrDie = require('@justinc/drill-conf').getOrDie;
@@ -19,7 +20,7 @@ module.exports = function _gen(argv, opts) {
 
   Promise.all([
     require('./resetWorkspace')(log),
-    require('./getReadableStreams')(log)
+    getReadableStreams(log)
   ])
     .then(([_resetWorkspaceResult, getReadableStreamsResult]) => {
       return Promise.all(

@@ -3,7 +3,7 @@ var bunyan = require('bunyan');
 var path = require('path');
 const ensureDirExists = require('../ensureDirExists');
 const LOGS_DIR_PATH = require('@justinc/drill-conf').logsDirPath;
-const LOG_FILE_PATH = path.join(LOGS_DIR_PATH, 'last-check-run.log');
+const LOG_FILE_PATH = path.join(LOGS_DIR_PATH, 'check.log');
 
 module.exports = {
   command: 'check [opts]',

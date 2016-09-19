@@ -16,7 +16,7 @@ module.exports = (log) => {
       let msg = 'Cannot generate a drill without resetting the workspace';
       console.log('\n' + msg);
       log.warn(msg);
-      return process.exit(0);
+      return process.exit(1);
     }
 
     return true;

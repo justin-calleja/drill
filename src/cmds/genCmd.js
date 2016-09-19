@@ -3,7 +3,7 @@ var bunyan = require('bunyan');
 var path = require('path');
 const LOGS_DIR_PATH = require('@justinc/drill-conf').logsDirPath;
 const ensureDirExists = require('../ensureDirExists');
-const LOG_FILE_PATH = path.join(LOGS_DIR_PATH, 'last-gen-run.log');
+const LOG_FILE_PATH = path.join(LOGS_DIR_PATH, 'gen.log');
 
 module.exports = {
   command: 'gen [opts]',
