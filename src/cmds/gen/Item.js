@@ -74,6 +74,13 @@ class Item {
     }
   }
 
+  toString() {
+    return JSON.stringify({
+      fileData: this.fileData,
+      nonFileData: this.nonFileData
+    }, null, 2);
+  }
+
   getId() {
     return this.nonFileData.id;
   }
