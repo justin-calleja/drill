@@ -15,6 +15,7 @@ const WORKSPACE_PATH = getOrDie('workspace.path');
 
 const QUIZ_ABS_PATH = path.join(WORKSPACE_PATH, QUIZ_FILE_NAME);
 
+// TODO: generation of quiz.md needs to change. Stream from db rather than files
 module.exports = function _gen(argv, opts) {
   var log = opts.log || noOpLogger;
 

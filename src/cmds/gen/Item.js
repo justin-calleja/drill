@@ -74,7 +74,7 @@ class Item {
     }
   }
 
-  toString() {
+  toJSON() {
     return JSON.stringify({
       fileData: this.fileData,
       nonFileData: this.nonFileData
