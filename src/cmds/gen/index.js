@@ -1,12 +1,14 @@
 const noOpLogger = require('@justinc/no-op-logger');
 const launchEditor = require('@justinc/launch-editor');
 const path = require('path');
-const streamToCache = require('./streamToCache');
 const itemsToQuestionsAsString = require('./itemsToQuestionsAsString');
 const fs = require('fs');
-const Promise = require('bluebird');
 const db = require('../../dbConnection');
-const getReadableStreams = require('../../getReadableStreams');
+const resetWorkspace = require('./resetWorkspace');
+const Item = require('./Item');
+const ItemCache = require('./ItemCache');
+var { calculateStrength } = require('./strength');
+const yesno = require('@justinc/yesno');
 
 const QUIZ_FILE_NAME = require('@justinc/drill-conf').defaultQuizFileName;
 const getOrDie = require('@justinc/drill-conf').getOrDie;
@@ -15,47 +17,51 @@ const WORKSPACE_PATH = getOrDie('workspace.path');
 
 const QUIZ_ABS_PATH = path.join(WORKSPACE_PATH, QUIZ_FILE_NAME);
 
-// TODO: generation of quiz.md needs to change. Stream from db rather than files
-module.exports = function _gen(argv, opts) {
-  var log = opts.log || noOpLogger;
-
-  Promise.all([
-    require('./resetWorkspace')(log),
-    getReadableStreams(log)
-  ])
-    .then(([_resetWorkspaceResult, getReadableStreamsResult]) => {
-      return Promise.all(
-        getReadableStreamsResult.map(stream => streamToCache({ log, stream, db }))
-      );
-    })
-    .then(caches => {
-      var mergedCache = caches.reduce((acc, cache) => acc.takeItemsFrom(cache));
-      return itemsToQuestionsAsString(mergedCache.getItems(), log);
-    })
-    .then(questionsAsStr => {
-      fs.writeFileSync(QUIZ_ABS_PATH, questionsAsStr);
-
-      if (argv.editorNo) {
-        console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
-      } else if (argv.editorYes) {
+function promptUserAfterGen(argv) {
+  if (argv.editorNo) {
+    console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
+  } else if (argv.editorYes) {
+    launchEditor(QUIZ_ABS_PATH, () => {
+      console.log('TODO: show user which command can be used to check results');
+    });
+  } else {
+    yesno({ message: 'Do you want to open the generated file in your editor now?' }).then(answer => {
+      if (answer.yes) {
         launchEditor(QUIZ_ABS_PATH, () => {
           console.log('TODO: show user which command can be used to check results');
         });
       } else {
-        require('@justinc/yesno')({ message: 'Do you want to open the generated file in your editor now?' }).then(answer => {
-          if (answer.yes) {
-            launchEditor(QUIZ_ABS_PATH, () => {
-              console.log('TODO: show user which command can be used to check results');
-            });
-          } else {
-            console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
-          }
-        });
+        console.log(`\nDone generating drill at ${QUIZ_ABS_PATH}\n`);
       }
-    })
-    .catch(err => {
-      console.log('\n', err.message, '\n');
-      process.exit(1);
     });
+  }
+}
+
+module.exports = function _gen(argv, opts) {
+  var log = opts.log || noOpLogger;
+
+  resetWorkspace(log).then(() => {
+    var cache = new ItemCache({ log: opts.log });
+
+    db.createReadStream()
+      .on('data', data => {
+        var item = new Item();
+        item.fromJSON(data.value);
+        var strength = calculateStrength(item, { log });
+        item.setStrength(strength);
+        cache.input(item);
+      })
+      .on('error', err => {
+        console.log(err.message);
+        process.exit(1);
+      })
+      .on('end', () => {
+        log.debug('Done streaming from db');
+        itemsToQuestionsAsString(cache.getItems(), log).then(questionsAsString => {
+          fs.writeFileSync(QUIZ_ABS_PATH, questionsAsString);
+          promptUserAfterGen(argv);
+        });
+      });
+  });
 
 };
