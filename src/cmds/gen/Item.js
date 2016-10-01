@@ -81,17 +81,39 @@ class Item {
     }, null, 2);
   }
 
+  fromJSON(itemAsJSON) {
+    var data = JSON.parse(itemAsJSON);
+    this.fileData = data.fileData;
+    this.nonFileData = data.nonFileData;
+  }
+
   getId() {
     return this.nonFileData.id;
   }
 
-  strength(strength) {
+  setStrength(strength) {
     this.nonFileData.strength = strength;
-    return this;
   }
 
   getStrength() {
     return this.nonFileData.strength || 0;
+  }
+
+  getNumberOfTimesAsked() {
+    return this.nonFileData.numberOfTimesAsked || 0;
+  }
+
+  /**
+   * Returns 1 if last answer was correct, -1 if it wasn't, and 0 if item was never
+   * asked.
+   * @return {number}
+   */
+  getLastAnswerWasCorrect() {
+    return this.nonFileData.lastAnswerWasCorrect || 0;
+  }
+
+  getLastAskedTime() {
+    return this.nonFileData.lastAnswedTime || new Date();
   }
 
   getQuestion() {

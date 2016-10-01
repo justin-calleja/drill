@@ -25,7 +25,8 @@ module.exports = (opts) => {
     const itemStream = stream.pipe(JSONStream.parse()).pipe(through.obj(function(parsedObj, _, cb) {
       var item = new Item(parsedObj, path.parse(stream.path));
       findStrength(item).then(s => {
-        this.push(item.strength(s));
+        item.setStrength(s);
+        this.push(item);
         cb();
       });
     }));
