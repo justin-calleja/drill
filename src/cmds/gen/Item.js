@@ -1,66 +1,7 @@
 const path = require('path');
 var generateId = require('./generateId');
-
-function oneOf(item) {
-  const answer = item.getAnswer();
-  const delegate = answer.delegate;
-  return (
-`# ${item.getId()}
-
-${item.getQuestion()}
-
-### ${delegate}
-
-${answer.choice.map(c => '- ' + c + ': ').join('\n')}
-
-- - -
-`);
-}
-
-function markCorrect(item) {
-  const answer = item.getAnswer();
-  const delegate = answer.delegate;
-  return (
-`# ${item.getId()}
-
-${item.getQuestion()}
-
-### ${delegate}
-
-${answer.choice.map(c => '- ' + c + ': ').join('\n')}
-
-- - -
-`);
-}
-
-function confirm(item) {
-  const answer = item.getAnswer();
-  const delegate = answer.delegate;
-  return (
-`# ${item.getId()}
-
-${item.getQuestion()}
-
-### ${delegate}
-
-- - -
-`);
-}
-
-
-function unorderedDelimited(item) {
-  const answer = item.getAnswer();
-  const delegate = answer.delegate;
-  return (
-`# ${item.getId()}
-
-${item.getQuestion()}
-
-### ${delegate}
-
-- - -
-`);
-}
+const qTemplates = require('./utils/qTemplates');
+const aCheckers = require('./utils/aCheckers');
 
 class Item {
 
@@ -103,6 +44,10 @@ class Item {
     return this.nonFileData.numberOfTimesAsked || 0;
   }
 
+  setNumberOfTimesAsked(num) {
+    this.nonFileData.numberOfTimesAsked = num;
+  }
+
   /**
    * Returns 1 if last answer was correct, -1 if it wasn't, and 0 if item was never
    * asked.
@@ -112,14 +57,35 @@ class Item {
     return this.nonFileData.lastAnswerWasCorrect || 0;
   }
 
+  setLastAnswerWasCorrect(bool) {
+    this.nonFileData.lastAnswerWasCorrect = bool ? 1 : -1;
+  }
+
+  addLatestUserAnswer(answer) {
+    var latestUserAnswers = this.nonFileData.latestUserAnswers || [];
+    latestUserAnswers.push({ time: new Date(), answer });
+
+    if (latestUserAnswers.length > 10) {
+      latestUserAnswers.shift();
+      this.nonFileData.latestUserAnswers = latestUserAnswers;
+    } else {
+      this.nonFileData.latestUserAnswers = latestUserAnswers;
+    }
+  }
+
   getLastAskedTime() {
     return this.nonFileData.lastAnswedTime || new Date();
+  }
+
+  setLastAskedTime(time) {
+    this.nonFileData.lastAnswedTime = time;
   }
 
   getQuestion() {
     return this.fileData.question;
   }
 
+  // TODO: major refactor. Should be "answerInfo" not "answer". Changes need to be made in data files too.
   getAnswer() {
     return this.fileData.answer;
   }
@@ -132,14 +98,55 @@ class Item {
     const answer = this.getAnswer();
     const delegate = answer.delegate;
     if (delegate === 'one-of') {
-      return oneOf(this);
+      return qTemplates.oneOf({
+        id: this.getId(),
+        question: this.getQuestion(),
+        type: delegate,
+        choices: answer.choices
+      });
     } else if (delegate === 'mark-correct') {
-      return markCorrect(this);
+      return qTemplates.markCorrect({
+        id: this.getId(),
+        question: this.getQuestion(),
+        type: delegate,
+        choices: answer.choices
+      });
     } else if (delegate === 'confirm') {
-      return confirm(this);
+      return qTemplates.confirm({
+        id: this.getId(),
+        question: this.getQuestion(),
+        type: delegate
+      });
     } else if (delegate === 'unordered-delimited') {
-      return unorderedDelimited(this);
+      return qTemplates.unorderedDelimited({
+        id: this.getId(),
+        question: this.getQuestion(),
+        type: delegate
+      });
     }
+  }
+
+  /**
+   * @param  {String} userAnswer
+   * @return {Promise<Item>}
+   */
+  checkAnswer(userAnswer) {
+    const answer = this.getAnswer();
+    const delegate = answer.delegate;
+    if (delegate === 'one-of') {
+      return aCheckers.oneOf(userAnswer, this);
+    } else if (delegate === 'mark-correct') {
+      return aCheckers.markCorrect(userAnswer, this);
+    } else if (delegate === 'confirm') {
+      return aCheckers.confirm(userAnswer, this).then(item => {
+        console.log('in confrim then, item:', item);
+        return item;
+      });
+    } else if (delegate === 'unordered-delimited') {
+      return aCheckers.unorderedDelimited(userAnswer, this);
+    }
+
+    throw new Error('No valid delegate');
   }
 
 }
