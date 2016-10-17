@@ -46,7 +46,7 @@
     "del": "^2.2.1",
     "empty-dir": "^0.2.0",
     "glob": "^7.0.5",
-    "inquirer": "^1.1.2",
+    "inquirer": "^1.2.1",
     "level": "^1.4.0",
     "mkdirp": "^0.5.1",
     "mkdirp-promise": "^3.0.1",

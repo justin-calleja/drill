@@ -1,5 +1,3 @@
-const choices = require('@justinc/choices');
-
 function oneOf(userAnswer, item) {
   var answerInfo = item.getAnswer();
   var correctIndex = answerInfo.correct;
@@ -17,7 +15,7 @@ function oneOf(userAnswer, item) {
   item.setNumberOfTimesAsked(item.getNumberOfTimesAsked() + 1);
   item.setLastAskedTime(new Date());
 
-  return Promise.resolve(item);
+  return item;
 }
 exports.oneOf = oneOf;
 
@@ -42,65 +40,15 @@ function markCorrect(userAnswer, item) {
   item.setNumberOfTimesAsked(item.getNumberOfTimesAsked() + 1);
   item.setLastAskedTime(new Date());
 
-  return Promise.resolve(item);
+  return item;
 }
 exports.markCorrect = markCorrect;
 
 function confirm(userAnswer, item) {
-  var answerInfo = item.getAnswer();
-  var correctAnswer = answerInfo.text;
-//   return choices({
-//     message: `For the question:
-//
-// ${item.getQuestion()}
-//
-// You answered:
-//
-// ${userAnswer}
-//
-// The actual answer is:
-//
-// ${correctAnswer}
-//
-// Do you think you're correct or close enough?`,
-//     choices: ['yes', 'no', 'skip']
-//   }).then(answer => {
-//     if (answer.choice !== 'skip') {
-//       item.addLatestUserAnswer({ userAnswer, checkSelection: answer.choice });
-//       item.setLastAnswerWasCorrect(answer.choice === 'yes');
-//       item.setNumberOfTimesAsked(item.getNumberOfTimesAsked() + 1);
-//       item.setLastAskedTime(new Date());
-//     }
-//     return item;
-//   });
+  item.addLatestUserAnswer(userAnswer);
+  item.setIsPendingUserConfirm(true);
 
-  return new Promise((resolve, _reject) => {
-    choices({
-      message: `For the question:
-
-${item.getQuestion()}
-
-You answered:
-
-${userAnswer}
-
-The actual answer is:
-
-${correctAnswer}
-
-Do you think you're correct or close enough?`,
-      choices: ['yes', 'no', 'skip']
-    }).then(answer => {
-      if (answer.choice !== 'skip') {
-        item.addLatestUserAnswer({ userAnswer, checkSelection: answer.choice });
-        item.setLastAnswerWasCorrect(answer.choice === 'yes');
-        item.setNumberOfTimesAsked(item.getNumberOfTimesAsked() + 1);
-        item.setLastAskedTime(new Date());
-      }
-      return resolve(item);
-    });
-
-  });
+  return item;
 }
 exports.confirm = confirm;
 
@@ -116,6 +64,6 @@ function unorderedDelimited(userAnswer, item) {
   item.setNumberOfTimesAsked(item.getNumberOfTimesAsked() + 1);
   item.setLastAskedTime(new Date());
 
-  return Promise.resolve(item);
+  return item;
 }
 exports.unorderedDelimited = unorderedDelimited;

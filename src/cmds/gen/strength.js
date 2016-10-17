@@ -15,10 +15,12 @@ const DEFAULT_WEIGHTS = {
 };
 
 function numberOfTimesAskedToStrength(numberOfTimesAsked, weight) {
+  weight = weight || DEFAULT_WEIGHTS.numberOfTimesAsked;
   return numberOfTimesAsked * weight;
 }
 
 function lastAnswerWasCorrectToStrength(lastAnswerWasCorrect, weights) {
+  weights = weights || DEFAULT_WEIGHTS.lastAnswerWasCorrect;
   if (lastAnswerWasCorrect === 1) return weights[0];
   if (lastAnswerWasCorrect === -1) return weights[1];
 
@@ -26,6 +28,7 @@ function lastAnswerWasCorrectToStrength(lastAnswerWasCorrect, weights) {
 }
 
 function lastAskedTimeToStrength(lastAskedTime, dayAndWeightPairs) {
+  dayAndWeightPairs = dayAndWeightPairs || DEFAULT_WEIGHTS.lastAskedTime;
   var dayAndWeight = dayAndWeightPairs.find((dAndW, _index) => {
     var result = moment(lastAskedTime).isAfter(moment().subtract(dAndW[0], 'days'));
     return result;

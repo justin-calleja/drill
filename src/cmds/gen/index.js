@@ -7,7 +7,6 @@ const db = require('../../dbConnection');
 const resetWorkspace = require('./resetWorkspace');
 const Item = require('./Item');
 const ItemCache = require('./ItemCache');
-var { calculateStrength } = require('./strength');
 const yesno = require('@justinc/yesno');
 
 const QUIZ_FILE_NAME = require('@justinc/drill-conf').defaultQuizFileName;
@@ -44,13 +43,7 @@ module.exports = function _gen(argv, opts) {
     var cache = new ItemCache({ log: opts.log });
 
     db.createReadStream()
-      .on('data', data => {
-        var item = new Item();
-        item.fromJSON(data.value);
-        var strength = calculateStrength(item, { log });
-        item.setStrength(strength);
-        cache.input(item);
-      })
+      .on('data', data => cache.input((new Item()).fromJSON(data.value, { log })))
       .on('error', err => {
         console.log(err.message);
         process.exit(1);
